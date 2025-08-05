@@ -549,20 +549,30 @@ function InteractiveLineChart() {
     return () => clearInterval(interval)
   }, [isLoading, realtimeData])
 
-  // Smooth number animation
+  // Smooth number animation - starts from 80% of target to avoid jarring 0-to-target jumps
   useEffect(() => {
     const animateToTarget = (key: 'online' | 'retail', target: number) => {
-      const start = animatedTotals[key]
-      const duration = 1500
+      // Only animate if there's a significant change (more than 5%)
+      const currentValue = animatedTotals[key]
+      const changePercent = Math.abs(target - currentValue) / target
+      
+      if (changePercent < 0.05) {
+        setAnimatedTotals(prev => ({ ...prev, [key]: target }))
+        return
+      }
+      
+      // Start from 80% of target value for smoother animation
+      const start = Math.max(currentValue, Math.floor(target * 0.8))
+      const duration = 3000 // 3 seconds as requested
       const startTime = Date.now()
       
       const animate = () => {
         const elapsed = Date.now() - startTime
         const progress = Math.min(elapsed / duration, 1)
         
-        // Easing function for smooth animation
-        const easeOutCubic = 1 - Math.pow(1 - progress, 3)
-        const current = Math.floor(start + (target - start) * easeOutCubic)
+        // Smooth easing function
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+        const current = Math.floor(start + (target - start) * easeOutQuart)
         
         setAnimatedTotals(prev => ({ ...prev, [key]: current }))
         
@@ -576,7 +586,7 @@ function InteractiveLineChart() {
     
     animateToTarget('online', total.online)
     animateToTarget('retail', total.retail)
-  }, [total, animatedTotals])
+  }, [total])
   
   return (
     <motion.div

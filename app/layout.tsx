@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   description: 'Next-generation analytics platform for digital marketing agencies and campaign managers',
   keywords: ['analytics', 'dashboard', 'marketing', 'campaigns', 'insights'],
   authors: [{ name: 'ADmyBRAND' }],
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 }
 
 export const viewport = {
